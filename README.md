@@ -97,6 +97,25 @@ npx -y github:rudraverma/veeam-mcp
         └── expressed as →  "command": "npx", "args": ["-y", "github:rudraverma/veeam-mcp"]
 ```
 
+#### Fastest (Claude Code) — one command that does everything
+
+If you use **Claude Code**, skip editing any files — run one command and it registers the server for you:
+
+```bash
+claude mcp add veeam -s user \
+  -e VEEAM_HOST=localhost \
+  -e VEEAM_USERNAME=svc-claude \
+  -e VEEAM_ACCEPT_SELF_SIGNED=true \
+  -e VEEAM_READONLY=true \
+  -- npx -y github:rudraverma/veeam-mcp
+```
+
+That's it. Add your Veeam password as one more `-e` flag (same `-e VEEAM_...=value` form as the others), then restart Claude Code. Flip `VEEAM_READONLY` to `false` once your first read-only connection checks out. Manage it later with `claude mcp list` and `claude mcp remove veeam`.
+
+> `-s user` installs it for your whole user account (every project). Drop it for a project-only install, or use `-s project` to share it with a repo via `.mcp.json`.
+
+#### Any other MCP client — edit the config file
+
 **Step 1.** Open your MCP client config file:
 - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 - **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
