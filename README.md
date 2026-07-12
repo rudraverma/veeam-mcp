@@ -90,10 +90,18 @@ The official [`veeam-ai/veeam-mcp-server`](https://github.com/veeam-ai/veeam-mcp
 
 ### Option A — One line, no clone (recommended)
 
-Point your MCP client straight at the GitHub package. `npx` fetches it, builds it on first launch, and runs it — no manual clone, install, or build. Just add this block and fill in your Veeam details:
+The install command is `npx -y github:rudraverma/veeam-mcp` — but **you don't run it yourself in a terminal.** With MCP, your client (Claude Desktop / Code) runs it for you every time it starts. You just tell the client to use that command by adding the block below to its config — the `"command"` and `"args"` lines *are* the `npx` command:
 
-**Claude Desktop / Claude Code** — edit the config file
-(`%APPDATA%\Claude\claude_desktop_config.json` on Windows, `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+```
+npx -y github:rudraverma/veeam-mcp
+        └── expressed as →  "command": "npx", "args": ["-y", "github:rudraverma/veeam-mcp"]
+```
+
+**Step 1.** Open your MCP client config file:
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+**Step 2.** Add this block (fill in your Veeam details) and save:
 
 ```json
 {
@@ -105,7 +113,7 @@ Point your MCP client straight at the GitHub package. `npx` fetches it, builds i
         "VEEAM_HOST": "localhost",
         "VEEAM_PORT": "9419",
         "VEEAM_USERNAME": "DOMAIN\\svc-claude",
-        "VEEAM_PASSWORD": "your-password",
+        "VEEAM_PASSWORD": "<your-password>",
         "VEEAM_ACCEPT_SELF_SIGNED": "true",
         "VEEAM_READONLY": "false"
       }
@@ -114,8 +122,15 @@ Point your MCP client straight at the GitHub package. `npx` fetches it, builds i
 }
 ```
 
-Restart your MCP client. That's it — no other steps.
+**Step 3.** Restart your MCP client. That's it — no clone, no build, no other steps.
 
+**Prefer to run the command yourself first?** (Optional sanity check.) Set your `VEEAM_*` variables in the shell environment (or copy `.env.example` to `.env` and fill it in), then run the command below. It prints a `connected to …` line and then waits for the client — press `Ctrl+C` to exit:
+
+```bash
+npx -y github:rudraverma/veeam-mcp
+```
+
+Notes:
 - **Requires:** `git` and **Node.js 20+** on your PATH (that's all `npx` needs).
 - **First launch** takes ~30–60s while npx installs and builds; every launch after that is instant from cache.
 - Point `VEEAM_HOST` at a remote VBR IP/hostname if the MCP isn't running on the backup server itself.
