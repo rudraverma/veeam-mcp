@@ -45,7 +45,7 @@ The official [`veeam-ai/veeam-mcp-server`](https://github.com/veeam-ai/veeam-mcp
 | Backend | Veeam Intelligence cloud chatbot | VBR on-box REST API v1 |
 | Capability | Read-only Q&A | Full read **+ write** operator |
 | Tools | 1 (question answering) | 30+ granular tools |
-| License requirement | Non-Community + Advanced mode | Any VBR with REST API enabled |
+| License requirement | Non-Community + Advanced mode | Enterprise Plus (REST API gate) |
 | Cloud dependency | Yes | **No** — stays on your network |
 
 > ⚠️ **Authorized use only.** This server can start, stop, create, and delete jobs and launch restores against production backup infrastructure. Run it only against Veeam instances **you own or are authorized to operate**. Ships with a `VEEAM_READONLY` safety switch.
@@ -75,11 +75,14 @@ The official [`veeam-ai/veeam-mcp-server`](https://github.com/veeam-ai/veeam-mcp
 ## Requirements
 
 - **Node.js 20+** (or Docker) on the machine that runs the MCP server
-- **Veeam Backup & Replication 12.0 or newer** with the **RESTful API service** enabled (default TCP port **9419**)
+- **Veeam Backup & Replication 12.0 or newer** with the **RESTful API service** running (default TCP port **9419**)
+- **An Enterprise Plus license** (or an Enterprise Plus **trial / NFR** key) on the VBR server — see the license note below
 - A **Veeam account** (Windows local/domain account) that can log into the VBR console
 - An **MCP client**: Claude Code, Claude Desktop, VS Code, etc.
 
-> The RESTful API service is installed and enabled by default in VBR 12.x. Verify in *Veeam Backup & Replication Console → Menu → Server Components* or that `https://<vbr-host>:9419/swagger` loads.
+> ⚠️ **License requirement — the Veeam REST API needs Enterprise Plus.** This is a Veeam licensing gate, not a limitation of this project. On **Community Edition** (or when no valid license is installed), the RESTful API service loads but stays in **standby mode** and never binds port 9419 — so nothing will answer. Veeam offers free **30-day Enterprise Plus trials** and **NFR** keys that enable it. Verify your API is live by confirming `https://<vbr-host>:9419/swagger` loads.
+>
+> Quick check that the listener is up (PowerShell): `Test-NetConnection localhost -Port 9419`. If it reports `TcpTestSucceeded : False`, check your license edition in *Console → Help → License Information* — it must be **Enterprise Plus**.
 
 ---
 
@@ -89,16 +92,16 @@ The official [`veeam-ai/veeam-mcp-server`](https://github.com/veeam-ai/veeam-mcp
 
 **Windows (PowerShell):**
 ```powershell
-git clone https://github.com/rudraverma/cyberhawk-veeam-mcp.git
-cd cyberhawk-veeam-mcp
+git clone https://github.com/rudraverma/veeam-mcp.git
+cd veeam-mcp
 npm install
 npm run build
 ```
 
 **macOS / Linux:**
 ```bash
-git clone https://github.com/rudraverma/cyberhawk-veeam-mcp.git
-cd cyberhawk-veeam-mcp
+git clone https://github.com/rudraverma/veeam-mcp.git
+cd veeam-mcp
 npm install
 npm run build
 ```
@@ -158,7 +161,7 @@ Edit `%APPDATA%\Claude\claude_desktop_config.json`:
   "mcpServers": {
     "veeam": {
       "command": "node",
-      "args": ["D:\\path\\to\\cyberhawk-veeam-mcp\\build\\index.js"],
+      "args": ["D:\\path\\to\\veeam-mcp\\build\\index.js"],
       "env": {
         "VEEAM_HOST": "localhost",
         "VEEAM_PORT": "9419",
@@ -179,7 +182,7 @@ Edit `%APPDATA%\Claude\claude_desktop_config.json`:
   "mcpServers": {
     "veeam": {
       "command": "node",
-      "args": ["/path/to/cyberhawk-veeam-mcp/build/index.js"],
+      "args": ["/path/to/veeam-mcp/build/index.js"],
       "env": {
         "VEEAM_HOST": "vbr.internal.example.com",
         "VEEAM_PORT": "9419",
@@ -196,14 +199,14 @@ Edit `%APPDATA%\Claude\claude_desktop_config.json`:
 ### Docker
 
 ```bash
-docker build -t cyberhawk-veeam-mcp .
+docker build -t veeam-mcp .
 ```
 ```json
 {
   "mcpServers": {
     "veeam": {
       "command": "docker",
-      "args": ["run", "--rm", "-i", "--env-file", "/path/to/.env", "cyberhawk-veeam-mcp"]
+      "args": ["run", "--rm", "-i", "--env-file", "/path/to/.env", "veeam-mcp"]
     }
   }
 }
@@ -280,7 +283,7 @@ Backup infrastructure is critical, so the server is deliberate about writes:
 ## Project structure
 
 ```
-cyberhawk-veeam-mcp/
+veeam-mcp/
 ├── src/
 │   ├── index.ts                 # MCP server entry point
 │   ├── config.ts                # env config + validation + API-version candidates
