@@ -1,0 +1,59 @@
+{
+    "name": "cyberhawk-veeam-mcp",
+    "version": "1.0.0",
+    "description": "Full-operator Model Context Protocol server for Veeam Backup & Replication (VBR) — read AND control jobs, sessions, backups, restores, infrastructure, and malware detection via the VBR Public REST API. Works across VBR 12.x builds. Built by CyberHawk Threat Intel.",
+    "type": "module",
+    "main": "build/index.js",
+    "bin": {
+        "cyberhawk-veeam-mcp": "build/index.js"
+    },
+    "files": [
+        "build/",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "build": "rm -rf build/ && node esbuild.config.js",
+        "start": "node --env-file-if-exists=.env build/index.js",
+        "dev": "node esbuild.config.js && node --env-file-if-exists=.env build/index.js",
+        "typecheck": "tsc --noEmit",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "format": "prettier --write \"src/**/*.ts\"",
+        "format:check": "prettier --check \"src/**/*.ts\"",
+        "inspector": "node esbuild.config.js && npx @modelcontextprotocol/inspector node ./build/index.js",
+        "ci": "npm run format:check && npm run lint && npm run typecheck"
+    },
+    "keywords": [
+        "veeam",
+        "vbr",
+        "backup",
+        "replication",
+        "mcp",
+        "model-context-protocol",
+        "claude",
+        "automation",
+        "disaster-recovery",
+        "cyberhawk"
+    ],
+    "author": "Rudra Verma | CyberHawk Threat Intel",
+    "license": "Apache-2.0",
+    "engines": {
+        "node": ">=20.0.0"
+    },
+    "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.25.2",
+        "axios": "^1.13.2",
+        "zod": "^3.25.0"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.39.2",
+        "@types/node": "^22.10.0",
+        "esbuild": "^0.25.0",
+        "eslint": "^9.39.2",
+        "eslint-config-prettier": "^10.1.8",
+        "prettier": "^3.4.2",
+        "typescript": "^5.7.0",
+        "typescript-eslint": "^8.52.0"
+    }
+}

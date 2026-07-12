@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Build output
+build/
+dist/
+*.tsbuildinfo
+
+# Environment / secrets — NEVER commit real credentials
+.env
+.env.local
+.env.*.local
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Caches
+.eslintcache
+.npm
+*.tgz
