@@ -88,80 +88,19 @@ The official [`veeam-ai/veeam-mcp-server`](https://github.com/veeam-ai/veeam-mcp
 
 ## Installation
 
-### 1. Clone and build
+### Option A — One line, no clone (recommended)
 
-**Windows (PowerShell):**
-```powershell
-git clone https://github.com/rudraverma/veeam-mcp.git
-cd veeam-mcp
-npm install
-npm run build
-```
+Point your MCP client straight at the GitHub package. `npx` fetches it, builds it on first launch, and runs it — no manual clone, install, or build. Just add this block and fill in your Veeam details:
 
-**macOS / Linux:**
-```bash
-git clone https://github.com/rudraverma/veeam-mcp.git
-cd veeam-mcp
-npm install
-npm run build
-```
-
-This produces `build/index.js`.
-
-### 2. Configure credentials
-
-Copy the example env file and fill in your values:
-
-**Windows:**
-```powershell
-Copy-Item .env.example .env
-notepad .env
-```
-
-**macOS / Linux:**
-```bash
-cp .env.example .env
-nano .env
-```
-
-Minimum required in `.env`:
-```
-VEEAM_HOST=localhost          # or your VBR host / IP
-VEEAM_PORT=9419
-VEEAM_USERNAME=DOMAIN\svc-claude
-VEEAM_PASSWORD=your-password
-VEEAM_ACCEPT_SELF_SIGNED=true
-VEEAM_READONLY=false          # true = read-only safety mode
-```
-
-> **Recommended:** create a dedicated Windows service account (e.g. `svc-claude`) and grant it a Veeam role under *Users and Roles* in the console, rather than using a personal admin login.
-
-### 3. (Optional) Test it standalone
-
-```bash
-npm start
-```
-You should see `connected to https://localhost:9419 (read-only=false)` on stderr. Press `Ctrl+C` to stop.
-
-Or launch the MCP Inspector to click through the tools:
-```bash
-npm run inspector
-```
-
----
-
-## Connect it to your MCP client
-
-### Claude Desktop / Claude Code (Windows)
-
-Edit `%APPDATA%\Claude\claude_desktop_config.json`:
+**Claude Desktop / Claude Code** — edit the config file
+(`%APPDATA%\Claude\claude_desktop_config.json` on Windows, `~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
 
 ```json
 {
   "mcpServers": {
     "veeam": {
-      "command": "node",
-      "args": ["D:\\path\\to\\veeam-mcp\\build\\index.js"],
+      "command": "npx",
+      "args": ["-y", "github:rudraverma/veeam-mcp"],
       "env": {
         "VEEAM_HOST": "localhost",
         "VEEAM_PORT": "9419",
@@ -175,7 +114,34 @@ Edit `%APPDATA%\Claude\claude_desktop_config.json`:
 }
 ```
 
-### macOS / Linux
+Restart your MCP client. That's it — no other steps.
+
+- **Requires:** `git` and **Node.js 20+** on your PATH (that's all `npx` needs).
+- **First launch** takes ~30–60s while npx installs and builds; every launch after that is instant from cache.
+- Point `VEEAM_HOST` at a remote VBR IP/hostname if the MCP isn't running on the backup server itself.
+- **Start safe:** set `VEEAM_READONLY` to `"true"` for your first connection to confirm everything reads correctly, then flip to `"false"` for full control.
+
+> **Recommended:** use a dedicated Veeam service account (e.g. `svc-claude`, **non-MFA** — Veeam's REST API and MFA don't mix) with a role assigned under *Users and Roles* in the console, rather than a personal admin login.
+
+### Option B — From source (offline / air-gapped / development)
+
+Clone and build once, then launch the built file directly.
+
+**Windows (PowerShell):**
+```powershell
+git clone https://github.com/rudraverma/veeam-mcp.git
+cd veeam-mcp
+npm install        # runs the build automatically (prepare script)
+```
+
+**macOS / Linux:**
+```bash
+git clone https://github.com/rudraverma/veeam-mcp.git
+cd veeam-mcp
+npm install        # runs the build automatically (prepare script)
+```
+
+Then point your client at the built file (adjust the path):
 
 ```json
 {
@@ -184,7 +150,7 @@ Edit `%APPDATA%\Claude\claude_desktop_config.json`:
       "command": "node",
       "args": ["/path/to/veeam-mcp/build/index.js"],
       "env": {
-        "VEEAM_HOST": "vbr.internal.example.com",
+        "VEEAM_HOST": "localhost",
         "VEEAM_PORT": "9419",
         "VEEAM_USERNAME": "svc-claude",
         "VEEAM_PASSWORD": "your-password",
@@ -196,9 +162,16 @@ Edit `%APPDATA%\Claude\claude_desktop_config.json`:
 }
 ```
 
-### Docker
+Optional smoke test before wiring it into a client — copy `.env.example` to `.env`, fill it in, then:
+```bash
+npm start            # prints "connected to https://<host>:9419 …" on stderr
+npm run inspector    # or click through the tools in the MCP Inspector
+```
+
+### Option C — Docker
 
 ```bash
+git clone https://github.com/rudraverma/veeam-mcp.git && cd veeam-mcp
 docker build -t veeam-mcp .
 ```
 ```json

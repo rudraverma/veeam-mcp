@@ -13,7 +13,9 @@
         "LICENSE"
     ],
     "scripts": {
-        "build": "rm -rf build/ && node esbuild.config.js",
+        "build": "node esbuild.config.js",
+        "prepare": "node esbuild.config.js",
+        "prepublishOnly": "node esbuild.config.js",
         "start": "node --env-file-if-exists=.env build/index.js",
         "dev": "node esbuild.config.js && node --env-file-if-exists=.env build/index.js",
         "typecheck": "tsc --noEmit",
